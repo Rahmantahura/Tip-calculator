@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const totalPerPersonValueDisplay = document.querySelector('.total-per-person-display .result-value');
     const historyList = document.querySelector('.history-list');
     const clearHistoryButton = document.querySelector('.clear-history-btn');
+    const tipTableBody = document.querySelector('#tip-table tbody');
 
 
 
@@ -70,6 +71,8 @@ function performCalculation() {
               const JSONarray = JSON.stringify(historyArray);
               localStorage.setItem('history', JSONarray);
               renderHistory();
+
+              generateTipTable(price, people);
         }
 
        // reset logic
@@ -85,14 +88,14 @@ function resetDisplay (){
 }
 
 let historyArray = [];
+loadHistory();
 
 function loadHistory () {
     const historyHolder = localStorage.getItem('history');
     if(historyHolder){
         historyArray = JSON.parse(historyHolder);
     }
-    loadHistory();
-
+    filterHighTips();
 }
 
 function renderHistory () {
@@ -111,6 +114,32 @@ function clearHistory () {
     localStorage.removeItem('history');
     historyArray = [];
     renderHistory();
+}
+
+function generateTipTable(bill, diners) {
+    tipTableBody.innerHTML = '';
+   for(let i = 10; i < 21; i++){
+    const currentTip = i / 100;
+        const tipAmount = bill * currentTip;
+        const totalBill = bill + tipAmount;
+
+        // 2. Create the HTML Row (Template Literal)
+        const newRow = document.createElement('tr');
+        
+        newRow.innerHTML = `
+            <td>${i}%</td>
+            <td>$${tipAmount.toFixed(2)}</td>
+            <td>$${totalBill.toFixed(2)}</td>
+        `;
+
+        // 3. Append the row to the table body
+        tipTableBody.appendChild(newRow);
+   }
+}
+
+function filterHighTips(){
+    const highTipHistory = historyArray.filter(entry => entry.tip > 15);
+    console.log("History with Tips > 15%:", highTipHistory);
 }
 
 });
