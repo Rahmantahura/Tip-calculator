@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function(){
     const totalBillValueDisplay = document.querySelector('.total-amount-display .result-value');
     const tipPerPersonValueDisplay = document.querySelector('.tip-per-person-display .result-value');
     const totalPerPersonValueDisplay = document.querySelector('.total-per-person-display .result-value');
+    const historyList = document.querySelector('.history-list');
+    const clearHistoryButton = document.querySelector('.clear-history-btn');
+
 
 
     calculateButton.addEventListener('click', function(Event){
@@ -23,6 +26,10 @@ document.addEventListener('DOMContentLoaded', function(){
 
     resetButton.addEventListener('click', function(){
         resetDisplay();
+    });
+
+    clearHistoryButton.addEventListener('click', function(){
+        clearHistory();
     });
 
 function performCalculation() {
@@ -51,7 +58,21 @@ function performCalculation() {
         totalBillValueDisplay.textContent = `$${totalBill.toFixed(2)}`;
         tipPerPersonValueDisplay.textContent = `$${tipPerPerson.toFixed(2)}`;
         totalPerPersonValueDisplay.textContent = `$${perPerson.toFixed(2)}`;
-}
+
+        const newHistoryEntry = {
+            price: price,
+            tip: tip * 100,
+            people: people,
+            timeStamp: new Date().toLocaleTimeString()
+        }
+             // History functionality
+              historyArray.unshift(newHistoryEntry);
+              const JSONarray = JSON.stringify(historyArray);
+              localStorage.setItem('history', JSONarray);
+              renderHistory();
+        }
+
+       // reset logic
 
 function resetDisplay (){
     priceValue.value = 0;
@@ -62,4 +83,34 @@ function resetDisplay (){
     tipPerPersonValueDisplay.textContent = '$0.00';
     totalPerPersonValueDisplay.textContent = '$0.00';
 }
+
+let historyArray = [];
+
+function loadHistory () {
+    const historyHolder = localStorage.getItem('history');
+    if(historyHolder){
+        historyArray = JSON.parse(historyHolder);
+    }
+    loadHistory();
+
+}
+
+function renderHistory () {
+    historyList.innerHTML = '';
+    historyArray.forEach(function(entry){
+        const li = document.createElement('li');
+        li.textContent = `Price: $${entry.price}, Tip: ${entry.tip}%, People: ${entry.people}, Time: ${entry.timeStamp}`;
+        historyList.appendChild(li);
+    });
+    if(historyArray.length === 0){
+        historyList.textContent = 'No previous calculations found.';
+    }
+}
+
+function clearHistory () {
+    localStorage.removeItem('history');
+    historyArray = [];
+    renderHistory();
+}
+
 });
