@@ -67,7 +67,7 @@ function performCalculation() {
             timeStamp: new Date().toLocaleTimeString()
         }
              // History functionality
-              historyArray.unshift(newHistoryEntry);
+              historyArray = [newHistoryEntry, ...historyArray]; 
               const JSONarray = JSON.stringify(historyArray);
               localStorage.setItem('history', JSONarray);
               renderHistory();
@@ -95,14 +95,18 @@ function loadHistory () {
     if(historyHolder){
         historyArray = JSON.parse(historyHolder);
     }
+    renderHistory();
     filterHighTips();
+    getGrandTotal();
+    logHistoryKeys();
 }
 
 function renderHistory () {
     historyList.innerHTML = '';
     historyArray.forEach(function(entry){
+        const { price, tip, people, timeStamp } = entry;
         const li = document.createElement('li');
-        li.textContent = `Price: $${entry.price}, Tip: ${entry.tip}%, People: ${entry.people}, Time: ${entry.timeStamp}`;
+        li.textContent = `Price: $${price}, Tip: ${tip}%, People: ${people}, Time: ${timeStamp}`;
         historyList.appendChild(li);
     });
     if(historyArray.length === 0){
@@ -131,15 +135,54 @@ function generateTipTable(bill, diners) {
             <td>$${tipAmount.toFixed(2)}</td>
             <td>$${totalBill.toFixed(2)}</td>
         `;
-
-        // 3. Append the row to the table body
         tipTableBody.appendChild(newRow);
    }
 }
 
 function filterHighTips(){
     const highTipHistory = historyArray.filter(entry => entry.tip > 15);
-    console.log("History with Tips > 15%:", highTipHistory);
+    // console.log("History with Tips > 15%:", highTipHistory);
 }
 
+function getGrandTotal() {
+    const totalBillPerEntry = historyArray.map(entry => {
+        return entry.price + entry.price * entry.tip / 100;
+    });
+
+    const grandTotal = totalBillPerEntry.reduce((sum, bill) => {
+        return sum + bill; 
+    }, 0); // Start the sum at 0
+
+    // console.log("Array of Total Bills (via Map):", totalBillPerEntry);
+    // console.log("Grand Total of All Calculated Bills (via Reduce):", grandTotal.toFixed(2));
+}
+
+function logHistoryKeys() {
+    if (historyArray.length === 0) {
+        console.log("No history data found.");
+        return;
+    }
+    const firstEntry = historyArray[0];
+    const keys = Object.keys(firstEntry);
+
+    // console.log("Keys in history array:", keys);
+}
+
+function fetchQuote() {
+    fetch('https://type.fit/api/quotes')
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log("--- Inspirational Quote ---");
+        console.log(`Quote: "${data[0].text}"`);
+        console.log(`Author: ${data[0].author}`);
+        console.log("---------------------------");
+    })
+    .catch(error => {
+        console.error('Error fetching quote:', error);
+    });
+}
+
+fetchQuote();
 });
