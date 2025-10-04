@@ -159,7 +159,7 @@ function getGrandTotal() {
 
 function logHistoryKeys() {
     if (historyArray.length === 0) {
-        console.log("No history data found.");
+        // console.log("No history data found.");
         return;
     }
     const firstEntry = historyArray[0];
@@ -168,21 +168,39 @@ function logHistoryKeys() {
     // console.log("Keys in history array:", keys);
 }
 
-function fetchQuote() {
-    fetch('https://type.fit/api/quotes')
-    .then(response => {
-        return response.json();
-    })
-    .then(data => {
-        console.log("--- Inspirational Quote ---");
-        console.log(`Quote: "${data[0].text}"`);
-        console.log(`Author: ${data[0].author}`);
-        console.log("---------------------------");
-    })
-    .catch(error => {
-        console.error('Error fetching quote:', error);
-    });
+// function fetchQuote() {
+//     const CorsSafeUrl = 'https://catfact.ninja/fact'; 
+//     fetch(CorsSafeUrl)
+//     .then(response => {
+//         return response.json();
+//     })
+//     .then(data => {
+//             console.log("--- Cat Fact ---");
+//             console.log(`Fact: "${data.fact}"`); // Use data.fact (not data[0].text)
+//             console.log("----------------");
+//     })
+//     .catch(error => {
+//         console.error('Error fetching fact:', error);
+//     });
+// }
+
+// fetchQuote();
+
+async function fetchRandomUser() {
+    try {
+        const userUrl = 'https://randomuser.me/api/?results=5';
+
+        const response = await fetch(userUrl);
+        const data = await response.json(); 
+
+        console.log("---Random User (Async/Await)---");
+        console.log(`User: "${data.results[0].name.first}"`); 
+        console.log("--------------------------");
+
+    } catch (error) {
+        console.error('Error fetching user:', error);
+    }
 }
 
-fetchQuote();
+fetchRandomUser();
 });
